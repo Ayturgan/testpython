@@ -47,5 +47,5 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAdminUser]
 
 
-def notifications_test(request):
-    return render(request, 'app/notifications_test.html')
+def interface(request):
+    return render(request, 'app_interface.html')

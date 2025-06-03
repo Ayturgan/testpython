@@ -11,4 +11,5 @@ router.register(r'users', views.UserViewSet, basename='user')
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('', views.interface, name='interface'),
 ]

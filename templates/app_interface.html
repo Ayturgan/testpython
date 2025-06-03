@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Блог - Тестовый Интерфейс</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .post-item, .comment-item, .user-item {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .post-item:hover, .comment-item:hover, .user-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(5px);
+        }
+
+        .post-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .post-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .post-content {
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .tags {
+            margin-top: 15px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+
+        .notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #4facfe;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .ws-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .ws-connected {
+            color: #4CAF50;
+        }
+
+        .ws-disconnected {
+            color: #f44336;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .comment-form {
+            background: rgba(240, 240, 240, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .tag-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tag-checkbox {
+            display: none;
+        }
+
+        .tag-label {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .tag-checkbox:checked + .tag-label {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .notifications {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ws-status" id="ws-status">
+        <span class="ws-disconnected">⚡ Подключение...</span>
+    </div>
+
+    <div class="notifications" id="notifications"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📝 Блог Тестер</h1>
+            <p>Полнофункциональный интерфейс для тестирования Django + Channels проекта</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="posts-count">0</div>
+                <div class="stat-label">Постов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="comments-count">0</div>
+                <div class="stat-label">Комментариев</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="tags-count">0</div>
+                <div class="stat-label">Тегов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="users-count">0</div>
+                <div class="stat-label">Пользователей</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('posts')">📄 Посты</button>
+            <button class="tab-btn" onclick="showTab('create-post')">➕ Создать пост</button>
+            <button class="tab-btn" onclick="showTab('comments')">💬 Комментарии</button>
+            <button class="tab-btn" onclick="showTab('tags')">🏷️ Теги</button>
+            <button class="tab-btn" onclick="showTab('users')">👥 Пользователи</button>
+        </div>
+
+        <!-- Вкладка: Посты -->
+        <div id="posts-tab" class="tab-content active">
+            <div class="card">
+                <div class="form-group">
+                    <input type="text" class="form-input search-box" id="posts-search" placeholder="🔍 Поиск постов...">
+                </div>
+                <div class="loading" id="posts-loading">
+                    <div class="spinner"></div>
+                    Загрузка постов...
+                </div>
+                <div id="posts-list"></div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Создание поста -->
+        <div id="create-post-tab" class="tab-content">
+            <div class="card">
+                <h2>✨ Создать новый пост</h2>
+                <form id="create-post-form">
+                    <div class="form-group">
+                        <label class="form-label">Заголовок</label>
+                        <input type="text" name="title" class="form-input" placeholder="Введите заголовок поста" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Содержание</label>
+                        <textarea name="content" class="form-textarea" placeholder="Напишите содержание поста" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Теги</label>
+                        <div class="tag-selector" id="available-tags">
+                            <!-- Теги будут загружены динамически -->
+                        </div>
+                        <input type="text" id="new-tag-input" class="form-input" placeholder="Или создайте новый тег">
+                        <button type="button" class="btn btn-secondary" onclick="addNewTag()">Добавить тег</button>
+                    </div>
+                    <button type="submit" class="btn">🚀 Опубликовать пост</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Вкладка: Комментарии -->
+        <div id="comments-tab" class="tab-content">
+            <div class="card">
+                <h2>💬 Все комментарии</h2>
+                <div class="loading" id="comments-loading">
+                    <div class="spinner"></div>
+                    Загрузка комментариев...
+                </div>
+                <div id="comments-list"></div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Теги -->
+        <div id="tags-tab" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h2>🏷️ Создать тег</h2>
+                    <form id="create-tag-form">
+                        <div class="form-group">
+                            <label class="form-label">Название тега</label>
+                            <input type="text" name="name" class="form-input" placeholder="Введите название тега" required>
+                        </div>
+                        <button type="submit" class="btn">✨ Создать тег</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>📋 Все теги</h2>
+                    <div class="loading" id="tags-loading">
+                        <div class="spinner"></div>
+                        Загрузка тегов...
+                    </div>
+                    <div id="tags-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Пользователи -->
+        <div id="users-tab" class="tab-content">
+            <div class="card">
+                <h2>👥 Пользователи системы</h2>
+                <div class="loading" id="users-loading">
+                    <div class="spinner"></div>
+                    Загрузка пользователей...
+                </div>
+                <div id="users-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let socket = null;
+        let currentData = {
+            posts: [],
+            comments: [],
+            tags: [],
+            users: []
+        };
+
+        // Утилиты
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const trimmed = cookie.trim();
+                    if (trimmed.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        async function apiRequest(url, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                return await response.json();
+            } catch (error) {
+                showNotification(`Ошибка API: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Управление вкладками
+        function showTab(tabName) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активный класс с кнопок
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Загрузить данные для вкладки
+            loadTabData(tabName);
+        }
+
+        // Загрузка данных для вкладок
+        async function loadTabData(tabName) {
+            switch(tabName) {
+                case 'posts':
+                    await loadPosts();
+                    break;
+                case 'create-post':
+                    await loadAvailableTags();
+                    break;
+                case 'comments':
+                    await loadComments();
+                    break;
+                case 'tags':
+                    await loadTags();
+                    break;
+                case 'users':
+                    await loadUsers();
+                    break;
+            }
+        }
+
+        // Загрузка постов
+        async function loadPosts() {
+            const loadingEl = document.getElementById('posts-loading');
+            const listEl = document.getElementById('posts-list');
+            
+            loadingEl.style.display = 'block';
+            
+            try {
+                const posts = await apiRequest('/app/api/posts/');
+                currentData.posts = posts.results || posts;
+                
+                listEl.innerHTML = '';
+                
+                if (currentData.posts.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: #666;">Пока нет постов. Создайте первый!</p>';
+                } else {
+                    currentData.posts.forEach(post => {
+                        const postEl = createPostElement(post);
+                        listEl.appendChild(postEl);
+                    });
+                }
+            } catch (error) {
+                listEl.innerHTML = '<p style="text-align: center; color: #f44336;">Ошибка загрузки постов</p>';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Создание элемента поста
+        function createPostElement(post) {
+            const div = document.createElement('div');
+            div.className = 'post-item';
+            
+            const tagsHtml = post.tags ? post.tags.map(tag => 
+                `<span class="tag">${typeof tag === 'object' ? tag.name : tag}</span>`
+            ).join('') : '';
+            
+            div.innerHTML = `
+                <div class="post-title">${post.title}</div>
+                <div class="post-meta">👤 Автор: ${post.author_username || 'Неизвестен'} | 📅 ${new Date(post.created_at).toLocaleString('ru')}</div>
+                <div class="post-content">${post.content}</div>
+                ${tagsHtml ? `<div class="tags">${tagsHtml}</div>` : ''}
+                <div class="comment-form">
+                    <form onsubmit="addComment(event, ${post.id})">
+                        <div class="form-group">
+                            <textarea name="text" class="form-textarea" placeholder="Добавить комментарий..." required style="min-height: 80px;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">💬 Добавить комментарий</button>
+                    </form>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Добавление комментария
+        async function addComment(event, postId) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                await apiRequest('/app/api/comments/', 'POST', {
+                    text: formData.get('text'),
+                    post: postId
+                });
+                
+                form.reset();
+                showNotification('Комментарий добавлен!', 'success');
+            } catch (error) {
+                console.error('Ошибка добавления комментария:', error);
+            }
+        }
+
+        // Загрузка комментариев
+        async function loadComments() {
+            const loadingEl = document.getElementById('comments-loading');
+            const listEl = document.getElementById('comments-list');
+            
+            loadingEl.style.display = 'block';
+            
+            try {
+                const comments = await apiRequest('/app/api/comments/');
+                currentData.comments = comments.results || comments;
+                
+                listEl.innerHTML = '';
+                
+                if (currentData.comments.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: #666;">Пока нет комментариев</p>';
+                } else {
+                    currentData.comments.forEach(comment => {
+                        const commentEl = document.createElement('div');
+                        commentEl.className = 'comment-item';
+                        commentEl.innerHTML = `
+                            <div style="margin-bottom: 10px;">
+                                <strong>👤 ${comment.author_username || 'Неизвестен'}</strong>
+                                <span style="color: #666; margin-left: 10px;">📅 ${new Date(comment.created_at).toLocaleString('ru')}</span>
+                            </div>
+                            <div style="margin-bottom: 10px; color: #666;">К посту: "${comment.post_title || 'Неизвестен'}"</div>
+                            <div>${comment.text}</div>
+                        `;
+                        listEl.appendChild(commentEl);
+                    });
+                }
+            } catch (error) {
+                listEl.innerHTML = '<p style="text-align: center; color: #f44336;">Ошибка загрузки комментариев</p>';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Загрузка тегов
+        async function loadTags() {
+            const loadingEl = document.getElementById('tags-loading');
+            const listEl = document.getElementById('tags-list');
+            
+            loadingEl.style.display = 'block';
+            
+            try {
+                const tags = await apiRequest('/app/api/tags/');
+                currentData.tags = tags.results || tags;
+                
+                listEl.innerHTML = '';
+                
+                if (currentData.tags.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: #666;">Пока нет тегов</p>';
+                } else {
+                    currentData.tags.forEach(tag => {
+                        const tagEl = document.createElement('div');
+                        tagEl.className = 'post-item';
+                        tagEl.innerHTML = `
+                            <div class="post-title">${tag.name}</div>
+                            <div class="post-meta">Используется в постах: ${tag.posts_count || 0}</div>
+                        `;
+                        listEl.appendChild(tagEl);
+                    });
+                }
+            } catch (error) {
+                listEl.innerHTML = '<p style="text-align: center; color: #f44336;">Ошибка загрузки тегов</p>';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Загрузка доступных тегов для создания поста
+        async function loadAvailableTags() {
+            try {
+                const tags = await apiRequest('/app/api/tags/');
+                currentData.tags = tags.results || tags;
+                
+                const container = document.getElementById('available-tags');
+                container.innerHTML = '';
+                
+                currentData.tags.forEach(tag => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `
+                        <input type="checkbox" class="tag-checkbox" name="tags" value="${tag.id}">
+                        <span class="tag-label">${tag.name}</span>
+                    `;
+                    container.appendChild(label);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки тегов:', error);
+            }
+        }
+
+        // Добавление нового тега
+        async function addNewTag() {
+            const input = document.getElementById('new-tag-input');
+            const tagName = input.value.trim();
+            
+            if (!tagName) return;
+            
+            try {
+                const newTag = await apiRequest('/app/api/tags/', 'POST', { name: tagName });
+                input.value = '';
+                showNotification(`Тег "${tagName}" создан!`, 'success');
+                await loadAvailableTags();
+            } catch (error) {
+                console.error('Ошибка создания тега:', error);
+            }
+        }
+
+        // Загрузка пользователей
+        async function loadUsers() {
+            const loadingEl = document.getElementById('users-loading');
+            const listEl = document.getElementById('users-list');
+            
+            loadingEl.style.display = 'block';
+            
+            try {
+                const users = await apiRequest('/app/api/users/');
+                currentData.users = users.results || users;
+                
+                listEl.innerHTML = '';
+                
+                if (currentData.users.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: #666;">Нет пользователей или нет доступа</p>';
+                } else {
+                    currentData.users.forEach(user => {
+                        const userEl = document.createElement('div');
+                        userEl.className = 'user-item';
+                        userEl.innerHTML = `
+                            <div class="post-title">👤 ${user.username}</div>
+                            <div class="post-meta">
+                                📧 ${user.email || 'Не указан'} | 
+                                📅 Регистрация: ${new Date(user.date_joined).toLocaleDateString('ru')}
+                            </div>
+                            <div>Постов: ${user.posts_count || 0} | Комментариев: ${user.comments_count || 0}</div>
+                        `;
+                        listEl.appendChild(userEl);
+                    });
+                }
+            } catch (error) {
+                listEl.innerHTML = '<p style="text-align: center; color: #f44336;">Ошибка загрузки пользователей (возможно, нужны права админа)</p>';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Обновление статистики
+        async function updateStats() {
+            try {
+                const [posts, comments, tags] = await Promise.all([
+                    apiRequest('/app/api/posts/'),
+                    apiRequest('/app/api/comments/'),
+                    apiRequest('/app/api/tags/')
+                ]);
+                
+                document.getElementById('posts-count').textContent = (posts.results || posts).length;
+                document.getElementById('comments-count').textContent = (comments.results || comments).length;
+                document.getElementById('tags-count').textContent = (tags.results || tags).length;
+                
+                // Пользователи могут быть недоступны без прав админа
+                try {
+                    const users = await apiRequest('/app/api/users/');
+                    document.getElementById('users-count').textContent = (users.results || users).length;
+                } catch (error) {
+                    document.getElementById('users-count').textContent = '—';
+                }
+            } catch (error) {
+                console.error('Ошибка обновления статистики:', error);
+            }
+        }
+
+        // Показ уведомлений
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            
+            let icon = '📄';
+            if (type === 'success') icon = '✅';
+            else if (type === 'error') icon = '❌';
+            else if (type === 'post') icon = '📝';
+            else if (type === 'comment') icon = '💬';
+            
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 5px;">${icon} ${type === 'error' ? 'Ошибка' : 'Уведомление'}</div>
+                <div>${typeof message === 'object' ? JSON.stringify(message) : message}</div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Автоматическое удаление через 5 секунд
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // WebSocket подключение
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws/notifications/`;
+            
+            socket = new WebSocket(wsUrl);
+            
+            socket.onopen = function() {
+                console.log('WebSocket подключен');
+                document.getElementById('ws-status').innerHTML = '<span class="ws-connected">⚡ Подключено</span>';
+                showNotification('WebSocket подключение установлено', 'success');
+            };
+            
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket сообщение:', data);
+                
+                if (data.type === 'notification' && data.message) {
+                    const msg = data.message;
+                    if (msg.type === 'post_created') {
+                        showNotification(`📝 Новый пост: "${msg.title}" от ${msg.author}`, 'post');
+                        loadPosts();
+                        updateStats();
+                    } else if (msg.type === 'comment_created') {
+                        showNotification(`💬 Новый комментарий от ${msg.author} к посту "${msg.post_title}"`, 'comment');
+                        loadComments();
+                        updateStats();
+                    }
+                } else {
+                    showNotification(data.message || 'Получено WebSocket сообщение');
+                }
+            };
+            
+            socket.onclose = function() {
+                console.log('WebSocket отключен');
+                document.getElementById('ws-status').innerHTML = '<span class="ws-disconnected">⚡ Отключено</span>';
+                showNotification('WebSocket соединение закрыто', 'error');
+                
+                // Переподключение через 3 секунды
+                setTimeout(connectWebSocket, 3000);
+            };
+            
+            socket.onerror = function(error) {
+                console.error('Ошибка WebSocket:', error);
+                showNotification('Ошибка WebSocket соединения', 'error');
+            };
+        }
+
+        // Обработчики форм
+        document.getElementById('create-post-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => parseInt(cb.value));
+            
+            try {
+                const postData = {
+                    title: formData.get('title'),
+                    content: formData.get('content'),
+                    tags: selectedTags
+                };
+                
+                await apiRequest('/app/api/posts/', 'POST', postData);
+                
+                e.target.reset();
+                document.querySelectorAll('input[name="tags"]:checked').forEach(cb => cb.checked = false);
+                
+                showNotification('Пост успешно создан!', 'success');
+                showTab('posts');
+            } catch (error) {
+                console.error('Ошибка создания поста:', error);
+            }
+        });
+
+        document.getElementById('create-tag-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                await apiRequest('/app/api/tags/', 'POST', {
+                    name: formData.get('name')
+                });
+                
+                e.target.reset();
+                showNotification('Тег успешно создан!', 'success');
+                await loadTags();
+                await updateStats();
+            } catch (error) {
+                console.error('Ошибка создания тега:', error);
+            }
+        });
+
+        // Поиск постов
+        document.getElementById('posts-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const posts = document.querySelectorAll('#posts-list .post-item');
+            
+            posts.forEach(post => {
+                const title = post.querySelector('.post-title').textContent.toLowerCase();
+                const content = post.querySelector('.post-content').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                    post.style.display = 'block';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        });
+
+        // Инициализация приложения
+        window.addEventListener('load', function() {
+            console.log('Приложение запущено');
+            showNotification('Добро пожаловать в Блог Тестер! 🚀', 'success');
+            
+            // Загружаем начальные данные
+            loadPosts();
+            updateStats();
+            
+            // Подключаем WebSocket
+            connectWebSocket();
+            
+            // Обновляем статистику каждые 30 секунд
+            setInterval(updateStats, 30000);
+        });
+    </script>
+</body>
+</html>
