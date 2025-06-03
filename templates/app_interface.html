@@ -195,10 +195,42 @@
             align-items: center;
         }
 
+        .post-card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover, .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
         .post-card-tags {
             display: flex;
             gap: 5px;
-            flex-wrap: wrap;
         }
 
         .tag-mini {
@@ -508,6 +540,34 @@
                 width: 95%;
                 margin: 5% auto;
             }
+        }
+
+        .comment-item, .tag-item, .user-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 3px solid #667eea;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .edit-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 10px;
+            border: 2px solid #667eea;
+        }
+
+        .post-card-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
         }
     </style>
 </head>
@@ -831,7 +891,6 @@
         function createCompactPostElement(post) {
             const div = document.createElement('div');
             div.className = 'post-card';
-            div.onclick = () => openPostModal(post.id);
             
             const tagsHtml = post.tags && post.tags.length > 0 ? 
                 post.tags.slice(0, 3).map(tag => 
@@ -839,10 +898,14 @@
                 ).join('') : '';
             
             div.innerHTML = `
-                <div class="post-card-title">${post.title}</div>
+                <div class="post-card-title" onclick="openPostModal(${post.id})">${post.title}</div>
                 <div class="post-card-meta">
                     <span>👤 ${post.author_username || 'Неизвестен'} | 📅 ${new Date(post.created_at).toLocaleDateString('ru')}</span>
                     <div class="post-card-tags">${tagsHtml}</div>
+                </div>
+                <div class="post-card-actions">
+                    <button class="btn-edit" onclick="editPost(${post.id}); event.stopPropagation();">✏️ Редактировать</button>
+                    <button class="btn-delete" onclick="deletePost(${post.id}); event.stopPropagation();">🗑️ Удалить</button>
                 </div>
             `;
             
@@ -894,7 +957,11 @@
                                 <span style="color: #666; margin-left: 10px;">📅 ${new Date(comment.created_at).toLocaleString('ru')}</span>
                             </div>
                             <div style="margin-bottom: 10px; color: #666;">К посту: "${comment.post_title || 'Неизвестен'}"</div>
-                            <div>${comment.text}</div>
+                            <div class="comment-text">${comment.text}</div>
+                            <div class="item-actions">
+                                <button class="btn-edit" onclick="editComment(${comment.id})">✏️ Редактировать</button>
+                                <button class="btn-delete" onclick="deleteComment(${comment.id})">🗑️ Удалить</button>
+                            </div>
                         `;
                         listEl.appendChild(commentEl);
                     });
@@ -923,10 +990,14 @@
                 } else {
                     currentData.tags.forEach(tag => {
                         const tagEl = document.createElement('div');
-                        tagEl.className = 'comment-item';
+                        tagEl.className = 'tag-item';
                         tagEl.innerHTML = `
                             <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">${tag.name}</div>
-                            <div style="color: #666;">Используется в постах: ${tag.posts_count || 0}</div>
+                            <div style="color: #666; margin-bottom: 10px;">ID: ${tag.id} | Используется в постах: ${tag.posts_count || 0}</div>
+                            <div class="item-actions">
+                                <button class="btn-edit" onclick="editTag(${tag.id})">✏️ Редактировать</button>
+                                <button class="btn-delete" onclick="deleteTag(${tag.id})">🗑️ Удалить</button>
+                            </div>
                         `;
                         listEl.appendChild(tagEl);
                     });
@@ -1185,6 +1256,197 @@
             
             setInterval(updateStats, 30000);
         });
+
+        // Функции CRUD для постов
+        async function editPost(postId) {
+            const post = currentData.posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const postCard = event.target.closest('.post-card');
+            const editFormHtml = `
+                <div class="edit-form">
+                    <h3>✏️ Редактировать пост</h3>
+                    <form onsubmit="updatePost(${postId}, event)">
+                        <div class="form-group">
+                            <label class="form-label">Заголовок</label>
+                            <input type="text" name="title" class="form-input" value="${post.title}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Содержание</label>
+                            <textarea name="content" class="form-textarea" required>${post.content}</textarea>
+                        </div>
+                        <div class="item-actions">
+                            <button type="submit" class="btn-edit">💾 Сохранить</button>
+                            <button type="button" class="btn-delete" onclick="cancelEdit(${postId})">❌ Отмена</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            postCard.innerHTML = editFormHtml;
+        }
+
+        async function updatePost(postId, event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                await apiRequest(`/app/api/posts/${postId}/`, 'PUT', {
+                    title: formData.get('title'),
+                    content: formData.get('content')
+                });
+                
+                showNotification('Пост обновлен!', 'success');
+                await loadPosts();
+            } catch (error) {
+                console.error('Ошибка обновления поста:', error);
+                showNotification('Ошибка обновления поста', 'error');
+            }
+        }
+
+        async function deletePost(postId) {
+            if (!confirm('Вы уверены, что хотите удалить этот пост?')) return;
+            
+            try {
+                await apiRequest(`/app/api/posts/${postId}/`, 'DELETE');
+                showNotification('Пост удален!', 'success');
+                await loadPosts();
+            } catch (error) {
+                console.error('Ошибка удаления поста:', error);
+                showNotification('Ошибка удаления поста', 'error');
+            }
+        }
+
+        function cancelEdit(postId) {
+            loadPosts();
+        }
+
+        // Функции CRUD для комментариев
+        async function editComment(commentId) {
+            const comment = currentData.comments.find(c => c.id === commentId);
+            if (!comment) return;
+            
+            const commentEl = event.target.closest('.comment-item');
+            const editFormHtml = `
+                <div>
+                    <strong>👤 ${comment.author_username || 'Неизвестен'}</strong>
+                    <span style="color: #666; margin-left: 10px;">📅 ${new Date(comment.created_at).toLocaleString('ru')}</span>
+                </div>
+                <div style="margin: 10px 0; color: #666;">К посту: "${comment.post_title || 'Неизвестен'}"</div>
+                <div class="edit-form">
+                    <form onsubmit="updateComment(${commentId}, event)">
+                        <div class="form-group">
+                            <label class="form-label">Текст комментария</label>
+                            <textarea name="text" class="form-textarea" required>${comment.text}</textarea>
+                        </div>
+                        <div class="item-actions">
+                            <button type="submit" class="btn-edit">💾 Сохранить</button>
+                            <button type="button" class="btn-delete" onclick="cancelCommentEdit()">❌ Отмена</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            commentEl.innerHTML = editFormHtml;
+        }
+
+        async function updateComment(commentId, event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                await apiRequest(`/app/api/comments/${commentId}/`, 'PUT', {
+                    text: formData.get('text')
+                });
+                
+                showNotification('Комментарий обновлен!', 'success');
+                await loadComments();
+            } catch (error) {
+                console.error('Ошибка обновления комментария:', error);
+                showNotification('Ошибка обновления комментария', 'error');
+            }
+        }
+
+        async function deleteComment(commentId) {
+            if (!confirm('Вы уверены, что хотите удалить этот комментарий?')) return;
+            
+            try {
+                await apiRequest(`/app/api/comments/${commentId}/`, 'DELETE');
+                showNotification('Комментарий удален!', 'success');
+                await loadComments();
+            } catch (error) {
+                console.error('Ошибка удаления комментария:', error);
+                showNotification('Ошибка удаления комментария', 'error');
+            }
+        }
+
+        function cancelCommentEdit() {
+            loadComments();
+        }
+
+        // Функции CRUD для тегов
+        async function editTag(tagId) {
+            const tag = currentData.tags.find(t => t.id === tagId);
+            if (!tag) return;
+            
+            const tagEl = event.target.closest('.tag-item');
+            const editFormHtml = `
+                <div class="edit-form">
+                    <h3>✏️ Редактировать тег</h3>
+                    <form onsubmit="updateTag(${tagId}, event)">
+                        <div class="form-group">
+                            <label class="form-label">Название тега</label>
+                            <input type="text" name="name" class="form-input" value="${tag.name}" required>
+                        </div>
+                        <div class="item-actions">
+                            <button type="submit" class="btn-edit">💾 Сохранить</button>
+                            <button type="button" class="btn-delete" onclick="cancelTagEdit()">❌ Отмена</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            tagEl.innerHTML = editFormHtml;
+        }
+
+        async function updateTag(tagId, event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                await apiRequest(`/app/api/tags/${tagId}/`, 'PUT', {
+                    name: formData.get('name')
+                });
+                
+                showNotification('Тег обновлен!', 'success');
+                await loadTags();
+                await loadAvailableTags(); // Обновляем теги в форме создания постов
+            } catch (error) {
+                console.error('Ошибка обновления тега:', error);
+                showNotification('Ошибка обновления тега', 'error');
+            }
+        }
+
+        async function deleteTag(tagId) {
+            if (!confirm('Вы уверены, что хотите удалить этот тег? Он будет удален из всех постов.')) return;
+            
+            try {
+                await apiRequest(`/app/api/tags/${tagId}/`, 'DELETE');
+                showNotification('Тег удален!', 'success');
+                await loadTags();
+                await loadAvailableTags(); // Обновляем теги в форме создания постов
+            } catch (error) {
+                console.error('Ошибка удаления тега:', error);
+                showNotification('Ошибка удаления тега', 'error');
+            }
+        }
+
+        function cancelTagEdit() {
+            loadTags();
+        }
     </script>
 </body>
 </html>
