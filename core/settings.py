@@ -36,6 +36,24 @@ if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
     ALLOWED_HOSTS.append(os.environ['RAILWAY_PUBLIC_DOMAIN'])
     print(f"🌐 Added Railway domain: {os.environ['RAILWAY_PUBLIC_DOMAIN']}")
 
+# CSRF настройки для Railway
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'https://localhost:8000']
+if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
+    railway_domain = os.environ['RAILWAY_PUBLIC_DOMAIN']
+    CSRF_TRUSTED_ORIGINS.extend([
+        f'https://{railway_domain}',
+        f'http://{railway_domain}'
+    ])
+    print(f"🔒 Added CSRF trusted origins for: {railway_domain}")
+
+# Для Railway также добавляем стандартные домены
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    CSRF_TRUSTED_ORIGINS.extend([
+        'https://*.railway.app',
+        'https://*.up.railway.app'
+    ])
+    print("🔒 Added Railway CSRF trusted origins")
+
 
 # Application definition
 
