@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-egu6xnc)y^v3dr=mgybkrsswbw(5(=hmx_-@_gd094*t6i5m#3')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Для Railway принудительно отключаем DEBUG
+# Для Railway с runserver оставляем DEBUG=True для обслуживания статических файлов
 if 'RAILWAY_ENVIRONMENT' in os.environ:
-    DEBUG = False
-    print("🚂 Railway environment detected, DEBUG disabled")
+    DEBUG = True  # Изменено с False на True для runserver
+    print("🚂 Railway environment detected, DEBUG enabled for runserver static files")
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
 if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
