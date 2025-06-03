@@ -9,5 +9,7 @@ dependencies = [
     "channels-redis>=4.2.1",
     "daphne>=4.2.0",
     "django>=5.2.1",
+    "djangorestframework>=3.16.0",
+    "drf-yasg>=1.21.10",
     "requests>=2.32.3",
 ]
