@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-egu6xnc)y^v3dr=mgybkrsswbw(5(=hmx_-@_gd094*t6i5m#3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
 
 
 # Application definition
@@ -50,7 +51,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.AllowAny',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -96,7 +97,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(os.environ.get('REDIS_HOST', 'redis'), 6379)],
         },
     },
 }
