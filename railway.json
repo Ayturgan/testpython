@@ -4,7 +4,7 @@
     "builder": "nixpacks"
   },
   "deploy": {
-    "startCommand": "echo '🚀 Starting migrations...' && python manage.py migrate && echo '📦 Collecting static files...' && python manage.py collectstatic --noinput && echo '🌐 Starting server with gunicorn on port $PORT...' && gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --log-level info",
+    "startCommand": "daphne -b 0.0.0.0 -p $PORT core.asgi:application",
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 3
   },

@@ -139,7 +139,9 @@ if 'PGHOST' in os.environ:
             'PORT': os.environ.get('PGPORT', '5432'),
             'OPTIONS': {
                 'sslmode': 'require',
-            }
+                'connect_timeout': 10,
+            },
+            'CONN_MAX_AGE': 600,
         }
     }
     print(f"🐘 Подключение к PostgreSQL: {os.environ.get('PGHOST')}:{os.environ.get('PGPORT')}")
