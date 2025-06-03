@@ -4,7 +4,7 @@
     "builder": "nixpacks"
   },
   "deploy": {
-    "startCommand": "daphne -b 0.0.0.0 -p $PORT core.asgi:application",
+    "startCommand": "sh -c 'gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT'",
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 3
   },
