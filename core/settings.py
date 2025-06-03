@@ -116,6 +116,10 @@ else:
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+print("🔍 Диагностика настроек...")
+print(f"DEBUG: {DEBUG}")
+print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+
 # Поддержка PostgreSQL для Railway
 if 'PGHOST' in os.environ:
     # Railway PostgreSQL configuration
@@ -133,6 +137,7 @@ if 'PGHOST' in os.environ:
         }
     }
     print(f"🐘 Подключение к PostgreSQL: {os.environ.get('PGHOST')}:{os.environ.get('PGPORT')}")
+    print(f"🗄️  База данных: {os.environ.get('PGDATABASE')}")
 else:
     # Локальная SQLite база
     DATABASES = {
@@ -142,6 +147,12 @@ else:
         }
     }
     print("📁 Используется локальная SQLite база данных")
+
+# Redis/Channels диагностика
+if 'REDIS_URL' in os.environ:
+    print(f"🔴 Redis URL найден: {os.environ.get('REDIS_URL')[:50]}...")
+else:
+    print("🔴 Redis URL не найден, используется InMemory channel layer")
 
 
 # Password validation
