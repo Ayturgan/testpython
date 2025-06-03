@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Блог - Тестовый Интерфейс</title>
-    <style>
+  <style>
         * {
             margin: 0;
             padding: 0;
@@ -569,7 +569,7 @@
             gap: 5px;
             flex-wrap: wrap;
         }
-    </style>
+  </style>
 </head>
 <body>
     <div class="ws-status" id="ws-status">
@@ -600,7 +600,7 @@
                                 <textarea name="text" class="form-textarea" placeholder="Ваш комментарий..." required style="min-height: 100px;"></textarea>
                             </div>
                             <button type="submit" class="btn btn-success">💬 Добавить комментарий</button>
-                        </form>
+  </form>
                     </div>
                 </div>
             </div>
@@ -697,7 +697,7 @@
                             <input type="text" name="name" class="form-input" placeholder="Введите название тега" required>
                         </div>
                         <button type="submit" class="btn">✨ Создать тег</button>
-                    </form>
+    </form>
                 </div>
                 <div class="card">
                     <h2>📋 Все теги</h2>
@@ -708,7 +708,7 @@
                     <div id="tags-list"></div>
                 </div>
             </div>
-        </div>
+  </div>
 
         <div id="users-tab" class="tab-content">
             <div class="card">
@@ -722,7 +722,7 @@
         </div>
     </div>
 
-    <script>
+  <script>
         let socket = null;
         let currentData = {
             posts: [],
@@ -730,28 +730,28 @@
             tags: [],
             users: []
         };
-        let currentPostId = null;
+    let currentPostId = null;
 
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (const cookie of cookies) {
-                    const trimmed = cookie.trim();
-                    if (trimmed.startsWith(name + '=')) {
-                        cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+            break;
+          }
         }
+      }
+      return cookieValue;
+    }
 
         const csrftoken = getCookie('csrftoken');
 
         async function apiRequest(url, method = 'GET', data = null) {
-            const options = {
-                method,
+      const options = {
+        method,
                 headers: {
                     'X-CSRFToken': csrftoken,
                     'Content-Type': 'application/json'
@@ -763,12 +763,27 @@
             }
 
             try {
-                const response = await fetch(url, options);
+      const response = await fetch(url, options);
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
-                return await response.json();
+                
+                // Проверяем если ответ пустой (204 No Content) или нет тела ответа
+                const contentLength = response.headers.get('content-length');
+                if (response.status === 204 || contentLength === '0') {
+                    return null; // Возвращаем null для пустых ответов
+                }
+                
+                // Проверяем содержит ли ответ JSON
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+                } else {
+                    // Если не JSON, возвращаем текст
+                    const text = await response.text();
+                    return text || null;
+                }
             } catch (error) {
                 showNotification(`Ошибка API: ${error.message}`, 'error');
                 throw error;
@@ -862,7 +877,7 @@
                     break;
             }
         }
-        async function loadPosts() {
+    async function loadPosts() {
             const loadingEl = document.getElementById('posts-loading');
             const listEl = document.getElementById('posts-list');
             
@@ -931,9 +946,9 @@
             } catch (error) {
                 console.error('Ошибка добавления комментария:', error);
             }
-        }
+    }
 
-        async function loadComments() {
+    async function loadComments() {
             const loadingEl = document.getElementById('comments-loading');
             const listEl = document.getElementById('comments-list');
             
@@ -1015,7 +1030,7 @@
                 currentData.tags = tags.results || tags;
                 
                 const container = document.getElementById('available-tags');
-                container.innerHTML = '';
+      container.innerHTML = '';
                 
                 currentData.tags.forEach(tag => {
                     const label = document.createElement('label');
@@ -1150,7 +1165,7 @@
                     const msg = data.message;
                     if (msg.type === 'post_created') {
                         showNotification(`📝 Новый пост: "${msg.title}" от ${msg.author}`, 'post');
-                        loadPosts();
+      loadPosts();
                         updateStats();
                     } else if (msg.type === 'comment_created') {
                         showNotification(`💬 Новый комментарий от ${msg.author} к посту "${msg.post_title}"`, 'comment');
@@ -1180,7 +1195,7 @@
         }
 
         document.getElementById('create-post-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
+      e.preventDefault();
             
             const formData = new FormData(e.target);
             const selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => parseInt(cb.value));
@@ -1250,9 +1265,9 @@
             console.log('Приложение запущено');
             showNotification('Добро пожаловать в Блог Тестер! 🚀', 'success');
             
-            loadPosts();
+      loadPosts();
             updateStats();
-            connectWebSocket();
+      connectWebSocket();
             
             setInterval(updateStats, 30000);
         });
@@ -1447,6 +1462,6 @@
         function cancelTagEdit() {
             loadTags();
         }
-    </script>
+  </script>
 </body>
 </html>

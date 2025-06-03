@@ -1,11 +1,14 @@
 [phases.setup]
-nixPkgs = ["python310", "pip"]
+nixPkgs = ["python311", "postgresql"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt"]
 
 [phases.build]
-cmds = ["python manage.py collectstatic --noinput"]
+cmds = [
+    "python manage.py collectstatic --noinput",
+    "python manage.py makemigrations",
+]
 
 [start]
-cmd = "daphne -b 0.0.0.0 -p $PORT core.asgi:application" 
+cmd = "python manage.py migrate && gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT" 

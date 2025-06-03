@@ -116,23 +116,23 @@ else:
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Поддержка MySQL для Railway
-if 'MYSQLHOST' in os.environ:
-    # Railway MySQL configuration
+# Поддержка PostgreSQL для Railway
+if 'PGHOST' in os.environ:
+    # Railway PostgreSQL configuration
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('MYSQLDATABASE'),
-            'USER': os.environ.get('MYSQLUSER'),
-            'PASSWORD': os.environ.get('MYSQLPASSWORD'),
-            'HOST': os.environ.get('MYSQLHOST'),
-            'PORT': os.environ.get('MYSQLPORT', '3306'),
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('PGDATABASE'),
+            'USER': os.environ.get('PGUSER'),
+            'PASSWORD': os.environ.get('PGPASSWORD'),
+            'HOST': os.environ.get('PGHOST'),
+            'PORT': os.environ.get('PGPORT', '5432'),
             'OPTIONS': {
-                'charset': 'utf8mb4',
-                'sql_mode': 'traditional',
+                'sslmode': 'require',
             }
         }
     }
+    print(f"🐘 Подключение к PostgreSQL: {os.environ.get('PGHOST')}:{os.environ.get('PGPORT')}")
 else:
     # Локальная SQLite база
     DATABASES = {
@@ -141,6 +141,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    print("📁 Используется локальная SQLite база данных")
 
 
 # Password validation

@@ -95,6 +95,7 @@ docker-compose up --build
 #### Требования
 - Python 3.11+
 - Redis (для WebSocket)
+- PostgreSQL (опционально, для продакшена)
 
 #### Установка
 
@@ -119,6 +120,9 @@ uv sync
 
 #### Настройка базы данных
 
+По умолчанию используется **SQLite** для локальной разработки.
+Для продакшена поддерживается **PostgreSQL**.
+
 ```bash
 # Создать и применить миграции
 python manage.py makemigrations
@@ -126,6 +130,18 @@ python manage.py migrate
 
 # Создать суперпользователя (опционально)
 python manage.py createsuperuser
+```
+
+#### Настройка PostgreSQL (опционально)
+
+Для использования PostgreSQL установите переменные окружения:
+
+```bash
+export PGHOST=localhost
+export PGDATABASE=blog_db
+export PGUSER=blog_user
+export PGPASSWORD=your_password
+export PGPORT=5432
 ```
 
 #### Запуск
